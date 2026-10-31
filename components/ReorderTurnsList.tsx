@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowDown, ArrowUp, CheckCircle2, Loader2, Save } from "lucide-react";
 import { reorderTurns } from "@/app/actions/san-actions";
@@ -34,6 +34,16 @@ export function ReorderTurnsList({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [dirty, setDirty] = useState(false);
+
+  // `useState`'s initializer solo corre una vez: si el admin agrega o
+  // reordena participantes y el servidor pasa un `members` nuevo, el
+  // estado local no se enteraba hasta recargar la página a mano. Se
+  // resincroniza acá, salvo que el admin ya esté reordenando (dirty).
+  useEffect(() => {
+    if (!dirty) {
+      setOrder([...members].sort((a, b) => a.turnNumber - b.turnNumber));
+    }
+  }, [members, dirty]);
 
   function move(index: number, direction: -1 | 1) {
     const target = index + direction;

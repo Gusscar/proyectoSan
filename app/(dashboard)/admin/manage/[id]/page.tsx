@@ -9,12 +9,16 @@ import { AddParticipantForm } from "@/components/AddParticipantForm";
 import { ReorderTurnsList } from "@/components/ReorderTurnsList";
 import { LogPaymentModal } from "@/components/LogPaymentModal";
 import { PaymentsMatrix } from "@/components/PaymentsMatrix";
+import { JoinAsParticipantCard } from "@/components/JoinAsParticipantCard";
 
 export default async function ManageSanPage(props: PageProps<"/admin/manage/[id]">) {
   const { id } = await props.params;
   const searchParams = await props.searchParams;
 
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   const { data: san } = await supabase
     .from("sans")
@@ -46,6 +50,15 @@ export default async function ManageSanPage(props: PageProps<"/admin/manage/[id]
     (a, b) => a.member.turn_number - b.member.turn_number,
   );
 
+  const isAdminAlreadyMember = sortedRows.some(
+    (row) => row.profile.id === user?.id,
+  );
+  const occupiedTurns = sortedRows.map((row) => ({
+    turnNumber: row.member.turn_number,
+    fullName: row.profile.full_name,
+    payoutDate: row.member.payout_date,
+  }));
+
   return (
     <div className="space-y-6">
       <Link
@@ -72,11 +85,7 @@ export default async function ManageSanPage(props: PageProps<"/admin/manage/[id]
           startDate={san.start_date}
           frequency={san.frequency}
           totalTurns={san.total_turns}
-          occupiedTurns={sortedRows.map((row) => ({
-            turnNumber: row.member.turn_number,
-            fullName: row.profile.full_name,
-            payoutDate: row.member.payout_date,
-          }))}
+          occupiedTurns={occupiedTurns}
         />
         <ReorderTurnsList
           sanId={san.id}
@@ -90,6 +99,16 @@ export default async function ManageSanPage(props: PageProps<"/admin/manage/[id]
           }))}
         />
       </div>
+
+      {!isAdminAlreadyMember && (
+        <JoinAsParticipantCard
+          sanId={san.id}
+          startDate={san.start_date}
+          frequency={san.frequency}
+          totalTurns={san.total_turns}
+          occupiedTurns={occupiedTurns}
+        />
+      )}
 
       <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/60">
         <div className="flex flex-col gap-3 border-b border-slate-800 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">

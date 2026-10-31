@@ -78,6 +78,41 @@ export async function reorderTurns(sanId: string, members: ReorderItem[]) {
   revalidatePath("/");
 }
 
+export async function joinSanAsAdmin(
+  sanId: string,
+  turnNumber: number,
+  payoutDate: string,
+) {
+  if (!Number.isInteger(turnNumber) || turnNumber <= 0) {
+    throw new Error("Elige un turno válido");
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("No autenticado");
+
+  // RLS (`san_members_insert_admin`) ya exige que el llamante sea el admin
+  // dueño del San; aquí solo se vincula su propio perfil como participante.
+  const { error } = await supabase.from("san_members").insert({
+    san_id: sanId,
+    user_id: user.id,
+    turn_number: turnNumber,
+    payout_date: payoutDate,
+  });
+
+  if (error) {
+    if (error.code === "23505") {
+      throw new Error("Ese turno ya está ocupado o ya participas en este San");
+    }
+    throw new Error(error.message);
+  }
+
+  revalidatePath(`/admin/manage/${sanId}`);
+  revalidatePath("/");
+}
+
 export async function updateAnnouncement(sanId: string, announcement: string) {
   const supabase = await createClient();
 
