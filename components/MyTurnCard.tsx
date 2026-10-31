@@ -17,23 +17,23 @@ export function MyTurnCard({
   potAmount,
 }: MyTurnCardProps) {
   return (
-    <div className="overflow-hidden rounded-2xl border border-slate-800 bg-gradient-to-br from-indigo-500/10 via-slate-900 to-slate-900 p-6 shadow-xl shadow-black/20">
-      <p className="text-sm font-medium text-indigo-400">{sanName}</p>
-      <h2 className="mt-1 text-lg font-semibold text-slate-100">Tu turno</h2>
+    <div className="overflow-hidden rounded-2xl border-2 border-indigo-200 bg-gradient-to-br from-indigo-50 via-white to-white p-6 shadow-md">
+      <p className="text-base font-semibold text-indigo-700">{sanName}</p>
+      <h2 className="mt-1 text-2xl font-bold text-slate-900">Tu turno</h2>
 
       <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
         <Stat
-          icon={<Hash className="h-4 w-4" />}
+          icon={<Hash className="h-5 w-5" />}
           label="Número de turno"
           value={`${turnNumber} de ${totalTurns}`}
         />
         <Stat
-          icon={<Calendar className="h-4 w-4" />}
+          icon={<Calendar className="h-5 w-5" />}
           label="Fecha de cobro"
           value={formatDate(payoutDate)}
         />
         <Stat
-          icon={<Coins className="h-4 w-4" />}
+          icon={<Coins className="h-5 w-5" />}
           label="Monto del pozo"
           value={formatCurrency(potAmount)}
           highlight
@@ -55,14 +55,14 @@ function Stat({
   highlight?: boolean;
 }) {
   return (
-    <div className="rounded-xl border border-slate-800/80 bg-slate-950/40 p-4">
-      <div className="flex items-center gap-1.5 text-slate-400">
+    <div className="rounded-xl border-2 border-slate-200 bg-white p-4 shadow-sm">
+      <div className="flex items-center gap-1.5 text-slate-500">
         {icon}
-        <span className="text-xs">{label}</span>
+        <span className="text-sm font-medium">{label}</span>
       </div>
       <p
-        className={`mt-1.5 text-lg font-semibold ${
-          highlight ? "text-emerald-400" : "text-slate-100"
+        className={`mt-1.5 text-2xl font-bold ${
+          highlight ? "text-emerald-700" : "text-slate-900"
         }`}
       >
         {value}

@@ -49,7 +49,7 @@ export function CreateSanForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-4 rounded-2xl border border-slate-800 bg-slate-900/60 p-6"
+      className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
     >
       <Field label="Nombre del San">
         <input
@@ -108,14 +108,14 @@ export function CreateSanForm() {
         </Field>
       </div>
 
-      {error && <p className="text-sm text-rose-400">{error}</p>}
+      {error && <p className="text-sm font-medium text-rose-700">{error}</p>}
 
       <button
         type="submit"
         disabled={loading}
-        className="flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-500 py-2.5 text-sm font-medium text-slate-950 transition hover:bg-emerald-400 disabled:opacity-60"
+        className="flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 py-3 text-base font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-60"
       >
-        {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+        {loading && <Loader2 className="h-5 w-5 animate-spin" />}
         Crear San
       </button>
     </form>
@@ -131,7 +131,7 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-sm text-slate-300">{label}</span>
+      <span className="mb-1.5 block text-base font-medium text-slate-700">{label}</span>
       {children}
     </label>
   );

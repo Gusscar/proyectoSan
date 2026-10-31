@@ -84,14 +84,14 @@ export function NotificationOptIn() {
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-50 p-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
-      <div className="mx-auto flex max-w-md items-center gap-3 rounded-2xl border border-slate-800 bg-slate-900 p-4 shadow-xl shadow-black/40">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400">
-          <Bell className="h-5 w-5" />
+      <div className="mx-auto flex max-w-md items-center gap-3 rounded-2xl border-2 border-indigo-200 bg-white p-4 shadow-xl">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-indigo-100 text-indigo-700">
+          <Bell className="h-6 w-6" />
         </div>
 
         <div className="flex-1 text-sm">
-          <p className="font-medium text-slate-100">Activa notificaciones</p>
-          <p className="mt-0.5 text-xs text-slate-400">
+          <p className="text-base font-semibold text-slate-900">Activa notificaciones</p>
+          <p className="mt-0.5 text-sm text-slate-600">
             {error ?? "Entérate al instante de nuevos avisos del San."}
           </p>
         </div>
@@ -99,18 +99,18 @@ export function NotificationOptIn() {
         <button
           onClick={enable}
           disabled={loading}
-          className="flex shrink-0 items-center gap-1.5 rounded-lg bg-indigo-500 px-3 py-2 text-xs font-medium text-white transition hover:bg-indigo-400 disabled:opacity-60"
+          className="flex shrink-0 items-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:opacity-60"
         >
-          {loading && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+          {loading && <Loader2 className="h-4 w-4 animate-spin" />}
           Activar
         </button>
 
         <button
           onClick={dismiss}
           aria-label="Cerrar"
-          className="shrink-0 rounded-lg p-1.5 text-slate-500 hover:bg-slate-800 hover:text-slate-300"
+          className="shrink-0 rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
         >
-          <X className="h-4 w-4" />
+          <X className="h-5 w-5" />
         </button>
       </div>
     </div>

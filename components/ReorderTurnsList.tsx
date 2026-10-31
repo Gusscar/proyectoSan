@@ -76,28 +76,28 @@ export function ReorderTurnsList({
   }
 
   return (
-    <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
+    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-slate-100">
+        <h2 className="text-base font-semibold text-slate-900">
           Orden de turnos
         </h2>
         {dirty && (
           <button
             onClick={handleSave}
             disabled={saving}
-            className="flex items-center gap-1.5 rounded-lg bg-indigo-500 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-indigo-400 disabled:opacity-60"
+            className="flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:opacity-60"
           >
             {saving ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              <Save className="h-3.5 w-3.5" />
+              <Save className="h-4 w-4" />
             )}
             Guardar orden
           </button>
         )}
       </div>
 
-      {error && <p className="mb-3 text-xs text-rose-400">{error}</p>}
+      {error && <p className="mb-3 text-sm font-medium text-rose-700">{error}</p>}
 
       <ul className="space-y-2">
         {order.map((member, index) => {
@@ -108,22 +108,22 @@ export function ReorderTurnsList({
           return (
           <li
             key={member.id}
-            className="flex items-center justify-between rounded-xl border border-slate-800/80 bg-slate-950/40 px-4 py-3"
+            className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-4 py-3"
           >
             <div>
-              <p className="flex items-center gap-1.5 text-sm font-medium text-slate-100">
+              <p className="flex items-center gap-1.5 text-base font-semibold text-slate-900">
                 #{dirty ? index + 1 : member.turnNumber} · {member.fullName}
                 {received && (
                   <span
                     title="Ya recibió el pozo"
-                    className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-1.5 py-0.5 text-[10px] font-medium text-emerald-400 ring-1 ring-inset ring-emerald-500/30"
+                    className="inline-flex items-center gap-1 rounded-full bg-emerald-600 px-2 py-0.5 text-xs font-semibold text-white"
                   >
-                    <CheckCircle2 className="h-2.5 w-2.5" />
+                    <CheckCircle2 className="h-3 w-3" />
                     Ya recibió
                   </span>
                 )}
               </p>
-              <p className="text-xs text-slate-500">
+              <p className="text-sm text-slate-600">
                 Cobra: {formatDate(payoutDate)}
               </p>
             </div>
@@ -131,18 +131,18 @@ export function ReorderTurnsList({
               <button
                 onClick={() => move(index, -1)}
                 disabled={index === 0}
-                className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-800 disabled:opacity-30"
+                className="rounded-lg p-2 text-slate-500 transition hover:bg-slate-200 disabled:opacity-30"
                 aria-label="Subir"
               >
-                <ArrowUp className="h-4 w-4" />
+                <ArrowUp className="h-5 w-5" />
               </button>
               <button
                 onClick={() => move(index, 1)}
                 disabled={index === order.length - 1}
-                className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-800 disabled:opacity-30"
+                className="rounded-lg p-2 text-slate-500 transition hover:bg-slate-200 disabled:opacity-30"
                 aria-label="Bajar"
               >
-                <ArrowDown className="h-4 w-4" />
+                <ArrowDown className="h-5 w-5" />
               </button>
             </div>
           </li>

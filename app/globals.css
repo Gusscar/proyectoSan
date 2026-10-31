@@ -6,13 +6,18 @@
 }
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 html,
 body {
-  background-color: #020617; /* slate-950 */
-  color: #f1f5f9; /* slate-100 */
+  background-color: #f8fafc; /* slate-50 */
+  color: #0f172a; /* slate-900 */
+}
+
+/* Base más grande en toda la app: la app la usan personas mayores. */
+html {
+  font-size: 17px;
 }
 
 body {
@@ -21,6 +26,6 @@ body {
 
 @layer components {
   .input {
-    @apply w-full rounded-lg border border-slate-800 bg-slate-950 px-3 py-2.5 text-sm text-slate-100 outline-none ring-emerald-500/50 placeholder:text-slate-600 focus:ring-2;
+    @apply w-full rounded-lg border-2 border-slate-300 bg-white px-4 py-3 text-base text-slate-900 outline-none ring-emerald-500/40 placeholder:text-slate-400 focus:border-emerald-600 focus:ring-2;
   }
 }

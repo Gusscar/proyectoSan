@@ -24,8 +24,8 @@ export default async function HomePage() {
 
   if (!memberships || memberships.length === 0) {
     return (
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-10 text-center">
-        <p className="text-sm text-slate-400">
+      <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center shadow-sm">
+        <p className="text-base text-slate-600">
           Aún no perteneces a ningún San. Pide a tu administrador que te
           agregue.
         </p>

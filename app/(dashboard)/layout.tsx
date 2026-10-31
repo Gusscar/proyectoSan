@@ -22,7 +22,7 @@ export default async function DashboardLayout({
     .single();
 
   return (
-    <div className="min-h-dvh bg-slate-950">
+    <div className="min-h-dvh bg-slate-50">
       <Navbar
         fullName={profile?.full_name ?? ""}
         isAdmin={profile?.role === "admin"}

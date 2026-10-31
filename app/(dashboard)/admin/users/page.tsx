@@ -47,16 +47,16 @@ export default async function AdminUsersPage() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-lg font-semibold text-slate-100">Mis Sans</h1>
-          <p className="text-sm text-slate-500">
+          <h1 className="text-xl font-bold text-slate-900">Mis Sans</h1>
+          <p className="text-base text-slate-600">
             Gestiona turnos, abonos y participantes de cada San.
           </p>
         </div>
         <Link
           href="/admin/create-san"
-          className="flex items-center gap-1.5 rounded-lg bg-emerald-500 px-3 py-2 text-sm font-medium text-slate-950 transition hover:bg-emerald-400"
+          className="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-4 py-2.5 text-base font-semibold text-white transition hover:bg-emerald-700"
         >
-          <Plus className="h-4 w-4" />
+          <Plus className="h-5 w-5" />
           Nuevo San
         </Link>
       </div>
@@ -66,31 +66,31 @@ export default async function AdminUsersPage() {
           <Link
             key={san.id}
             href={`/admin/manage/${san.id}`}
-            className="group flex flex-col justify-between rounded-2xl border border-slate-800 bg-slate-900/60 p-5 transition hover:border-slate-700 hover:bg-slate-900"
+            className="group flex flex-col justify-between rounded-2xl border-2 border-slate-200 bg-white p-5 shadow-sm transition hover:border-emerald-400 hover:shadow-md"
           >
             <div>
-              <h2 className="font-semibold text-slate-100">{san.name}</h2>
-              <p className="mt-1 text-sm text-slate-400">
+              <h2 className="text-lg font-bold text-slate-900">{san.name}</h2>
+              <p className="mt-1 text-base text-slate-700">
                 {formatCurrency(san.contribution_amount)} · {san.total_turns}{" "}
                 turnos
               </p>
-              <p className="mt-1 flex items-center gap-1 text-xs text-slate-500">
-                <Users className="h-3.5 w-3.5" />
+              <p className="mt-1 flex items-center gap-1 text-sm text-slate-500">
+                <Users className="h-4 w-4" />
                 {memberCounts.get(san.id) ?? 0} participante
                 {memberCounts.get(san.id) === 1 ? "" : "s"}
               </p>
             </div>
-            <div className="mt-4 flex items-center gap-1 text-sm font-medium text-emerald-400">
+            <div className="mt-4 flex items-center gap-1 text-base font-semibold text-emerald-700">
               Gestionar
-              <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+              <ArrowRight className="h-5 w-5 transition group-hover:translate-x-0.5" />
             </div>
           </Link>
         ))}
 
         {(!sans || sans.length === 0) && (
-          <div className="rounded-2xl border border-dashed border-slate-800 p-8 text-center text-sm text-slate-500 sm:col-span-2">
+          <div className="rounded-2xl border-2 border-dashed border-slate-300 p-8 text-center text-base text-slate-600 sm:col-span-2">
             Aún no has creado ningún San.{" "}
-            <Link href="/admin/create-san" className="text-emerald-400">
+            <Link href="/admin/create-san" className="font-semibold text-emerald-700">
               Crea el primero
             </Link>
             .
@@ -99,7 +99,7 @@ export default async function AdminUsersPage() {
       </div>
 
       <div>
-        <h2 className="mb-3 text-sm font-semibold text-slate-100">
+        <h2 className="mb-3 text-base font-semibold text-slate-900">
           Credenciales temporales
         </h2>
         <CredentialsTable rows={credentials ?? []} />

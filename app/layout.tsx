@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#020617",
+  themeColor: "#f8fafc",
   width: "device-width",
   initialScale: 1,
 };
@@ -36,7 +36,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="es"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-slate-950">
+      <body className="min-h-full flex flex-col bg-slate-50">
         {children}
         <InstallPrompt />
       </body>

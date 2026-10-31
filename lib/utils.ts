@@ -107,9 +107,16 @@ export const PAYMENT_STATUS_LABEL: Record<PaymentStatus, string> = {
 };
 
 export const PAYMENT_STATUS_COLOR: Record<PaymentStatus, string> = {
-  "al-dia": "bg-emerald-500/15 text-emerald-400 ring-emerald-500/30",
-  incompleto: "bg-amber-500/15 text-amber-400 ring-amber-500/30",
-  pendiente: "bg-rose-500/15 text-rose-400 ring-rose-500/30",
+  "al-dia": "bg-emerald-100 text-emerald-800 ring-emerald-600",
+  incompleto: "bg-amber-100 text-amber-800 ring-amber-600",
+  pendiente: "bg-rose-100 text-rose-800 ring-rose-600",
+};
+
+/** Versión sólida y vívida para indicadores pequeños (puntos de estado). */
+export const PAYMENT_STATUS_DOT_COLOR: Record<PaymentStatus, string> = {
+  "al-dia": "bg-emerald-600 ring-emerald-800",
+  incompleto: "bg-amber-500 ring-amber-700",
+  pendiente: "bg-rose-600 ring-rose-800",
 };
 
 /** Genera una contraseña temporal aleatoria y segura (no es un patrón adivinable). */

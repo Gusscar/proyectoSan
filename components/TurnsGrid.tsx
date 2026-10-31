@@ -22,7 +22,7 @@ export function TurnsGrid({ totalTurns, occupied, value, onChange }: TurnsGridPr
 
   return (
     <div>
-      <div className="grid grid-cols-6 gap-1.5 sm:grid-cols-8">
+      <div className="grid grid-cols-5 gap-2 sm:grid-cols-6">
         {turns.map((turn) => {
           const member = occupiedMap.get(turn);
           const received = member ? new Date(member.payoutDate) <= today : false;
@@ -40,15 +40,15 @@ export function TurnsGrid({ totalTurns, occupied, value, onChange }: TurnsGridPr
                   : "Disponible"
               }
               className={cn(
-                "flex h-9 items-center justify-center rounded-lg text-xs font-medium ring-1 ring-inset transition",
+                "flex h-12 items-center justify-center rounded-lg text-base font-bold ring-2 ring-inset transition",
                 member && received &&
-                  "cursor-not-allowed bg-emerald-500/20 text-emerald-300 ring-emerald-500/40",
+                  "cursor-not-allowed bg-emerald-600 text-white ring-emerald-700",
                 member && !received &&
-                  "cursor-not-allowed bg-rose-500/15 text-rose-400 ring-rose-500/30",
+                  "cursor-not-allowed bg-rose-100 text-rose-700 ring-rose-400",
                 !member && isSelected &&
-                  "bg-indigo-500 text-white ring-indigo-400",
+                  "cursor-pointer bg-indigo-600 text-white ring-indigo-700",
                 !member && !isSelected &&
-                  "cursor-pointer bg-emerald-500/10 text-emerald-400 ring-emerald-500/20 hover:bg-emerald-500/20",
+                  "cursor-pointer bg-emerald-50 text-emerald-700 ring-emerald-500 hover:bg-emerald-100",
               )}
             >
               {turn}
@@ -57,11 +57,11 @@ export function TurnsGrid({ totalTurns, occupied, value, onChange }: TurnsGridPr
         })}
       </div>
 
-      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-slate-500">
-        <Legend swatch="bg-emerald-500/10 ring-emerald-500/20" label="Disponible" />
-        <Legend swatch="bg-rose-500/15 ring-rose-500/30" label="Ocupado" />
-        <Legend swatch="bg-emerald-500/20 ring-emerald-500/40" label="Ya recibió" />
-        <Legend swatch="bg-indigo-500 ring-indigo-400" label="Seleccionado" />
+      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-sm text-slate-600">
+        <Legend swatch="bg-emerald-50 ring-emerald-500" label="Disponible" />
+        <Legend swatch="bg-rose-100 ring-rose-400" label="Ocupado" />
+        <Legend swatch="bg-emerald-600 ring-emerald-700" label="Ya recibió" />
+        <Legend swatch="bg-indigo-600 ring-indigo-700" label="Seleccionado" />
       </div>
     </div>
   );
@@ -70,7 +70,7 @@ export function TurnsGrid({ totalTurns, occupied, value, onChange }: TurnsGridPr
 function Legend({ swatch, label }: { swatch: string; label: string }) {
   return (
     <span className="flex items-center gap-1.5">
-      <span className={cn("h-3 w-3 rounded ring-1 ring-inset", swatch)} />
+      <span className={cn("h-3.5 w-3.5 rounded ring-2 ring-inset", swatch)} />
       {label}
     </span>
   );

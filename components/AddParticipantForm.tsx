@@ -108,9 +108,9 @@ export function AddParticipantForm({
   const noTurnsLeft = firstAvailableTurn(totalTurns, occupiedTurns) === null;
 
   return (
-    <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
-      <h2 className="mb-4 flex items-center gap-2 text-sm font-semibold text-slate-100">
-        <UserPlus className="h-4 w-4" />
+    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <h2 className="mb-4 flex items-center gap-2 text-base font-semibold text-slate-900">
+        <UserPlus className="h-5 w-5 text-indigo-700" />
         Agregar participante
       </h2>
 
@@ -142,9 +142,9 @@ export function AddParticipantForm({
         />
 
         <div>
-          <span className="mb-1.5 block text-sm text-slate-300">Turno</span>
+          <span className="mb-1.5 block text-base font-medium text-slate-700">Turno</span>
           {noTurnsLeft ? (
-            <p className="text-xs text-rose-400">
+            <p className="text-sm font-medium text-rose-700">
               No quedan turnos disponibles en este San.
             </p>
           ) : (
@@ -157,28 +157,28 @@ export function AddParticipantForm({
           )}
         </div>
 
-        {error && <p className="text-xs text-rose-400">{error}</p>}
+        {error && <p className="text-sm font-medium text-rose-700">{error}</p>}
 
         <button
           type="submit"
           disabled={loading || noTurnsLeft}
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-500 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-400 disabled:cursor-not-allowed disabled:opacity-60"
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-600 py-3 text-base font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+          {loading && <Loader2 className="h-5 w-5 animate-spin" />}
           Crear acceso
         </button>
       </form>
 
       {created && (
-        <div className="mt-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3">
-          <p className="flex items-center gap-1.5 text-xs font-medium text-emerald-400">
-            <CheckCircle2 className="h-3.5 w-3.5" />
+        <div className="mt-4 rounded-xl border-2 border-emerald-500 bg-emerald-50 p-3">
+          <p className="flex items-center gap-1.5 text-sm font-semibold text-emerald-800">
+            <CheckCircle2 className="h-4 w-4" />
             Participante creado
           </p>
-          <div className="mt-2 flex items-center justify-between gap-2 rounded-lg bg-slate-950 px-3 py-2">
-            <div className="text-xs text-slate-300">
+          <div className="mt-2 flex items-center justify-between gap-2 rounded-lg bg-white px-3 py-2.5 ring-1 ring-inset ring-slate-200">
+            <div className="text-sm text-slate-700">
               <p>Usuario: {created.username}</p>
-              <p className="font-mono text-emerald-400">
+              <p className="font-mono text-base font-semibold text-emerald-700">
                 {created.tempPassword}
               </p>
             </div>
@@ -189,14 +189,14 @@ export function AddParticipantForm({
                   `Usuario: ${created.username}\nContraseña temporal: ${created.tempPassword}`,
                 )
               }
-              className="rounded-lg p-2 text-slate-400 hover:bg-slate-800 hover:text-slate-200"
+              className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700"
               aria-label="Copiar credenciales"
             >
-              <Copy className="h-4 w-4" />
+              <Copy className="h-5 w-5" />
             </button>
           </div>
           <WhatsAppShareButton
-            className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-lg bg-[#25D366] py-2 text-xs font-medium text-slate-950 transition hover:bg-[#25D366]/90"
+            className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-lg bg-[#25D366] py-2.5 text-base font-semibold text-white transition hover:bg-[#1ebe5a]"
             phone={created.phone}
             label="Enviar por WhatsApp"
             fullName={created.fullName}

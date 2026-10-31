@@ -56,18 +56,18 @@ export function JoinAsParticipantCard({
   }
 
   return (
-    <div className="rounded-2xl border border-indigo-500/30 bg-indigo-500/5 p-5">
-      <h2 className="mb-1 flex items-center gap-2 text-sm font-semibold text-slate-100">
-        <UserCheck className="h-4 w-4 text-indigo-400" />
+    <div className="rounded-2xl border-2 border-indigo-300 bg-indigo-50 p-5">
+      <h2 className="mb-1 flex items-center gap-2 text-base font-semibold text-slate-900">
+        <UserCheck className="h-5 w-5 text-indigo-700" />
         ¿Tú también participas en este San?
       </h2>
-      <p className="mb-4 text-xs text-slate-500">
+      <p className="mb-4 text-sm text-slate-600">
         Si el administrador también aporta y recibe turno, elige tu lugar
         aquí (por ejemplo, el último).
       </p>
 
       {noTurnsLeft ? (
-        <p className="text-xs text-rose-400">
+        <p className="text-sm font-medium text-rose-700">
           No quedan turnos disponibles en este San.
         </p>
       ) : (
@@ -79,14 +79,14 @@ export function JoinAsParticipantCard({
             onChange={setTurnNumber}
           />
 
-          {error && <p className="mt-2 text-xs text-rose-400">{error}</p>}
+          {error && <p className="mt-2 text-sm font-medium text-rose-700">{error}</p>}
 
           <button
             onClick={handleJoin}
             disabled={loading || !turnNumber}
-            className="mt-3 flex items-center justify-center gap-2 rounded-lg bg-indigo-500 px-4 py-2 text-xs font-medium text-white transition hover:bg-indigo-400 disabled:cursor-not-allowed disabled:opacity-60"
+            className="mt-3 flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-5 py-2.5 text-base font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {loading && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+            {loading && <Loader2 className="h-4 w-4 animate-spin" />}
             Unirme como participante
           </button>
         </>

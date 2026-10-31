@@ -39,10 +39,10 @@ export function WhatsAppShareButton({
       aria-label="Compartir por WhatsApp"
       className={
         className ??
-        "inline-flex items-center gap-1.5 rounded-lg bg-[#25D366]/10 px-3 py-1.5 text-xs font-medium text-[#25D366] ring-1 ring-inset ring-[#25D366]/30 transition hover:bg-[#25D366]/20"
+        "inline-flex items-center gap-1.5 rounded-lg bg-[#25D366]/15 px-3.5 py-2 text-sm font-semibold text-[#128C4A] ring-2 ring-inset ring-[#25D366]/40 transition hover:bg-[#25D366]/25"
       }
     >
-      <WhatsAppIcon className="h-3.5 w-3.5" />
+      <WhatsAppIcon className="h-4 w-4" />
       {label}
     </a>
   );

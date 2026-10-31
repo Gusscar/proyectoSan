@@ -23,12 +23,12 @@ export function TransparencyBoard({
   );
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/60">
-      <div className="border-b border-slate-800 px-5 py-4">
-        <h2 className="text-sm font-semibold text-slate-100">
+    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div className="border-b border-slate-200 px-5 py-4">
+        <h2 className="text-base font-semibold text-slate-900">
           Tabla de transparencia
         </h2>
-        <p className="text-xs text-slate-500">
+        <p className="text-sm text-slate-600">
           Turnos, abonos del periodo actual y estado de cada participante.
         </p>
       </div>
@@ -36,15 +36,15 @@ export function TransparencyBoard({
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-slate-800 text-left text-xs uppercase tracking-wide text-slate-500">
-              <th className="px-5 py-3 font-medium">Turno</th>
-              <th className="px-5 py-3 font-medium">Participante</th>
-              <th className="px-5 py-3 font-medium">Fecha de cobro</th>
-              <th className="px-5 py-3 font-medium">Abonado</th>
-              <th className="px-5 py-3 font-medium">Estado</th>
+            <tr className="border-b border-slate-200 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+              <th className="px-5 py-3">Turno</th>
+              <th className="px-5 py-3">Participante</th>
+              <th className="px-5 py-3">Fecha de cobro</th>
+              <th className="px-5 py-3">Abonado</th>
+              <th className="px-5 py-3">Estado</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-800/70">
+          <tbody className="divide-y divide-slate-200">
             {sorted.map((row) => {
               const isCurrentUser = row.profile.id === currentUserId;
               return (
@@ -52,31 +52,31 @@ export function TransparencyBoard({
                   key={row.member.id}
                   className={cn(
                     "transition",
-                    isCurrentUser && "bg-emerald-500/5",
+                    isCurrentUser && "bg-emerald-50",
                   )}
                 >
-                  <td className="px-5 py-3 text-slate-300">
+                  <td className="px-5 py-3 font-medium text-slate-700">
                     #{row.member.turn_number}
                   </td>
-                  <td className="px-5 py-3 font-medium text-slate-100">
+                  <td className="px-5 py-3 font-medium text-slate-900">
                     {row.profile.full_name}
                     {isCurrentUser && (
-                      <span className="ml-2 text-xs font-normal text-emerald-400">
+                      <span className="ml-2 text-xs font-normal text-emerald-700">
                         (tú)
                       </span>
                     )}
                   </td>
-                  <td className="px-5 py-3 text-slate-400">
+                  <td className="px-5 py-3 text-slate-600">
                     {formatDate(row.member.payout_date)}
                   </td>
-                  <td className="px-5 py-3 text-slate-300">
+                  <td className="px-5 py-3 text-slate-700">
                     {formatCurrency(row.payment?.amount_paid ?? 0)} /{" "}
                     {formatCurrency(contributionAmount)}
                   </td>
                   <td className="px-5 py-3">
                     <span
                       className={cn(
-                        "inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset",
+                        "inline-flex items-center rounded-full px-3 py-1 text-sm font-semibold ring-2 ring-inset",
                         PAYMENT_STATUS_COLOR[row.status],
                       )}
                     >
