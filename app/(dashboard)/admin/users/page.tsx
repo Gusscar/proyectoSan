@@ -24,7 +24,7 @@ export default async function AdminUsersPage() {
       .returns<San[]>(),
     supabase
       .from("member_credentials")
-      .select("*, sans(name), profiles(full_name)")
+      .select("*, sans(name), profiles(full_name, phone)")
       .order("created_at", { ascending: false })
       .returns<CredentialRow[]>(),
   ]);

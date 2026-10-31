@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { KeyRound, Loader2, RotateCcw } from "lucide-react";
+import { WhatsAppShareButton } from "@/components/WhatsAppShareButton";
 import type { MemberCredential, Profile, San } from "@/lib/supabase/types";
 
 export type CredentialRow = MemberCredential & {
   sans: Pick<San, "name"> | null;
-  profiles: Pick<Profile, "full_name"> | null;
+  profiles: Pick<Profile, "full_name" | "phone"> | null;
 };
 
 export function CredentialsTable({ rows }: { rows: CredentialRow[] }) {
@@ -75,18 +76,26 @@ export function CredentialsTable({ rows }: { rows: CredentialRow[] }) {
                   </span>
                 </td>
                 <td className="px-5 py-3">
-                  <button
-                    onClick={() => handleReset(credential)}
-                    disabled={resettingId === credential.id}
-                    className="flex items-center gap-1.5 rounded-lg border border-slate-800 px-2.5 py-1.5 text-xs text-slate-400 transition hover:bg-slate-800 disabled:opacity-60"
-                  >
-                    {resettingId === credential.id ? (
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                    ) : (
-                      <RotateCcw className="h-3.5 w-3.5" />
-                    )}
-                    Restablecer
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleReset(credential)}
+                      disabled={resettingId === credential.id}
+                      className="flex items-center gap-1.5 rounded-lg border border-slate-800 px-2.5 py-1.5 text-xs text-slate-400 transition hover:bg-slate-800 disabled:opacity-60"
+                    >
+                      {resettingId === credential.id ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      ) : (
+                        <RotateCcw className="h-3.5 w-3.5" />
+                      )}
+                      Restablecer
+                    </button>
+                    <WhatsAppShareButton
+                      phone={credential.profiles?.phone}
+                      fullName={credential.profiles?.full_name ?? ""}
+                      username={credential.username ?? credential.email ?? ""}
+                      password={credential.temp_password}
+                    />
+                  </div>
                 </td>
               </tr>
             ))}

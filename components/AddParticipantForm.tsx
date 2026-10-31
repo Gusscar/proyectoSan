@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { CheckCircle2, Copy, Loader2, UserPlus } from "lucide-react";
 import { computePayoutDate, normalizeUsername } from "@/lib/utils";
+import { WhatsAppShareButton } from "@/components/WhatsAppShareButton";
 import type { Frequency } from "@/lib/supabase/types";
 
 interface AddParticipantFormProps {
@@ -14,7 +15,9 @@ interface AddParticipantFormProps {
 }
 
 interface CreatedCredential {
+  fullName: string;
   username: string;
+  phone: string;
   tempPassword: string;
 }
 
@@ -60,7 +63,12 @@ export function AddParticipantForm({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "No se pudo crear el participante");
 
-      setCreated({ username: cleanUsername, tempPassword: data.tempPassword });
+      setCreated({
+        fullName,
+        username: cleanUsername,
+        phone,
+        tempPassword: data.tempPassword,
+      });
       setUsername("");
       setFullName("");
       setPhone("");
@@ -154,6 +162,14 @@ export function AddParticipantForm({
               <Copy className="h-4 w-4" />
             </button>
           </div>
+          <WhatsAppShareButton
+            className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-lg bg-[#25D366] py-2 text-xs font-medium text-slate-950 transition hover:bg-[#25D366]/90"
+            phone={created.phone}
+            label="Enviar por WhatsApp"
+            fullName={created.fullName}
+            username={created.username}
+            password={created.tempPassword}
+          />
         </div>
       )}
     </div>
