@@ -16,6 +16,16 @@ export interface CreateSanInput {
 }
 
 export async function createSan(input: CreateSanInput) {
+  if (!input.name.trim()) {
+    throw new Error("El nombre del San es obligatorio");
+  }
+  if (!Number.isFinite(input.contributionAmount) || input.contributionAmount <= 0) {
+    throw new Error("El monto por periodo debe ser mayor a 0");
+  }
+  if (!Number.isInteger(input.totalTurns) || input.totalTurns <= 0) {
+    throw new Error("El total de turnos debe ser un número entero mayor a 0");
+  }
+
   const supabase = await createClient();
   const {
     data: { user },

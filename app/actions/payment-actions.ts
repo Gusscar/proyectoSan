@@ -2,6 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { formatCurrency } from "@/lib/utils";
+
+function round2(value: number) {
+  return Math.round(value * 100) / 100;
+}
 
 export async function addPaymentAbono(
   sanId: string,
@@ -9,8 +14,8 @@ export async function addPaymentAbono(
   roundNumber: number,
   amountToAdd: number,
 ) {
-  if (amountToAdd <= 0) {
-    throw new Error("El monto a abonar debe ser mayor a 0");
+  if (!Number.isFinite(amountToAdd) || amountToAdd <= 0) {
+    throw new Error("El monto a abonar debe ser un número mayor a 0");
   }
 
   const supabase = await createClient();
@@ -32,7 +37,15 @@ export async function addPaymentAbono(
     .maybeSingle();
 
   const currentTotal = currentPayment?.amount_paid ?? 0;
-  const newTotal = currentTotal + amountToAdd;
+  const newTotal = round2(currentTotal + amountToAdd);
+
+  if (newTotal > san.contribution_amount) {
+    const remaining = Math.max(round2(san.contribution_amount - currentTotal), 0);
+    throw new Error(
+      `El abono excede lo pendiente del periodo: solo faltan ${formatCurrency(remaining)}.`,
+    );
+  }
+
   const isComplete = newTotal >= san.contribution_amount;
 
   const { error } = await supabase.from("payments").upsert(

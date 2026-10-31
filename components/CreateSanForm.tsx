@@ -17,15 +17,28 @@ export function CreateSanForm() {
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
-    setLoading(true);
     setError(null);
+
+    const amount = Number(contributionAmount);
+    const turns = Number(totalTurns);
+
+    if (!Number.isFinite(amount) || amount <= 0) {
+      setError("El monto por periodo debe ser mayor a 0");
+      return;
+    }
+    if (!Number.isInteger(turns) || turns <= 0) {
+      setError("El total de turnos debe ser un número entero mayor a 0");
+      return;
+    }
+
+    setLoading(true);
     try {
       await createSan({
         name,
-        contributionAmount: Number(contributionAmount),
+        contributionAmount: amount,
         frequency,
         startDate,
-        totalTurns: Number(totalTurns),
+        totalTurns: turns,
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : "No se pudo crear el San");

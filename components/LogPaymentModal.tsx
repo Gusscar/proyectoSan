@@ -50,8 +50,12 @@ export function LogPaymentModal({
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
     const value = Number(amount);
-    if (!value || value <= 0) {
+    if (!Number.isFinite(value) || value <= 0) {
       setError("Ingresa un monto válido");
+      return;
+    }
+    if (value > remaining + 0.01) {
+      setError(`El monto no puede superar lo pendiente (${formatCurrency(remaining)})`);
       return;
     }
     submit(value);
