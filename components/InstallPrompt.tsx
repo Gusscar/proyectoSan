@@ -1,0 +1,108 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { Download, Share, X } from "lucide-react";
+
+const DISMISSED_KEY = "sanapp_install_dismissed_at";
+const DISMISS_DAYS = 14;
+
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
+}
+
+function wasRecentlyDismissed() {
+  const raw = localStorage.getItem(DISMISSED_KEY);
+  if (!raw) return false;
+  const dismissedAt = Number(raw);
+  const elapsedDays = (Date.now() - dismissedAt) / (1000 * 60 * 60 * 24);
+  return elapsedDays < DISMISS_DAYS;
+}
+
+export function InstallPrompt() {
+  const [deferredPrompt, setDeferredPrompt] =
+    useState<BeforeInstallPromptEvent | null>(null);
+  const [isIOS, setIsIOS] = useState(false);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const isStandalone =
+      window.matchMedia("(display-mode: standalone)").matches ||
+      (window.navigator as unknown as { standalone?: boolean }).standalone === true;
+
+    if (isStandalone || wasRecentlyDismissed()) return;
+
+    const iOS = /iPad|iPhone|iPod/.test(window.navigator.userAgent);
+    setIsIOS(iOS);
+    if (iOS) setVisible(true);
+
+    function handleBeforeInstallPrompt(event: Event) {
+      event.preventDefault();
+      setDeferredPrompt(event as BeforeInstallPromptEvent);
+      setVisible(true);
+    }
+
+    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+    return () =>
+      window.removeEventListener(
+        "beforeinstallprompt",
+        handleBeforeInstallPrompt,
+      );
+  }, []);
+
+  function dismiss() {
+    localStorage.setItem(DISMISSED_KEY, String(Date.now()));
+    setVisible(false);
+  }
+
+  async function install() {
+    if (!deferredPrompt) return;
+    await deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    setDeferredPrompt(null);
+    setVisible(false);
+  }
+
+  if (!visible) return null;
+
+  return (
+    <div className="fixed inset-x-0 bottom-0 z-50 p-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
+      <div className="mx-auto flex max-w-md items-center gap-3 rounded-2xl border border-slate-800 bg-slate-900 p-4 shadow-xl shadow-black/40">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400">
+          <Download className="h-5 w-5" />
+        </div>
+
+        <div className="flex-1 text-sm">
+          <p className="font-medium text-slate-100">Instala SanApp</p>
+          {isIOS ? (
+            <p className="mt-0.5 flex items-center gap-1 text-xs text-slate-400">
+              Toca <Share className="h-3.5 w-3.5" /> y luego &quot;Agregar a
+              inicio&quot;
+            </p>
+          ) : (
+            <p className="mt-0.5 text-xs text-slate-400">
+              Accede más rápido desde tu pantalla de inicio.
+            </p>
+          )}
+        </div>
+
+        {!isIOS && deferredPrompt && (
+          <button
+            onClick={install}
+            className="shrink-0 rounded-lg bg-emerald-500 px-3 py-2 text-xs font-medium text-slate-950 transition hover:bg-emerald-400"
+          >
+            Instalar
+          </button>
+        )}
+
+        <button
+          onClick={dismiss}
+          aria-label="Cerrar"
+          className="shrink-0 rounded-lg p-1.5 text-slate-500 hover:bg-slate-800 hover:text-slate-300"
+        >
+          <X className="h-4 w-4" />
+        </button>
+      </div>
+    </div>
+  );
+}

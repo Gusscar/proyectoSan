@@ -1,0 +1,128 @@
+"use client";
+
+import { useState, type FormEvent } from "react";
+import { Loader2 } from "lucide-react";
+import { createSan } from "@/app/actions/san-actions";
+import type { Frequency } from "@/lib/supabase/types";
+
+export function CreateSanForm() {
+  const [name, setName] = useState("");
+  const [contributionAmount, setContributionAmount] = useState("");
+  const [frequency, setFrequency] = useState<Frequency>("monthly");
+  const [startDate, setStartDate] = useState("");
+  const [totalTurns, setTotalTurns] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSubmit(event: FormEvent) {
+    event.preventDefault();
+    setLoading(true);
+    setError(null);
+    try {
+      await createSan({
+        name,
+        contributionAmount: Number(contributionAmount),
+        frequency,
+        startDate,
+        totalTurns: Number(totalTurns),
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "No se pudo crear el San");
+      setLoading(false);
+    }
+  }
+
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-4 rounded-2xl border border-slate-800 bg-slate-900/60 p-6"
+    >
+      <Field label="Nombre del San">
+        <input
+          required
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="San familiar 2026"
+          className="input"
+        />
+      </Field>
+
+      <div className="grid grid-cols-2 gap-4">
+        <Field label="Monto por periodo">
+          <input
+            required
+            type="number"
+            step="0.01"
+            min="0"
+            value={contributionAmount}
+            onChange={(e) => setContributionAmount(e.target.value)}
+            placeholder="1000"
+            className="input"
+          />
+        </Field>
+
+        <Field label="Frecuencia">
+          <select
+            value={frequency}
+            onChange={(e) => setFrequency(e.target.value as Frequency)}
+            className="input"
+          >
+            <option value="weekly">Semanal</option>
+            <option value="biweekly">Quincenal</option>
+            <option value="monthly">Mensual</option>
+          </select>
+        </Field>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <Field label="Fecha de inicio">
+          <input
+            required
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="input"
+          />
+        </Field>
+
+        <Field label="Total de turnos">
+          <input
+            required
+            type="number"
+            min="1"
+            value={totalTurns}
+            onChange={(e) => setTotalTurns(e.target.value)}
+            placeholder="12"
+            className="input"
+          />
+        </Field>
+      </div>
+
+      {error && <p className="text-sm text-rose-400">{error}</p>}
+
+      <button
+        type="submit"
+        disabled={loading}
+        className="flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-500 py-2.5 text-sm font-medium text-slate-950 transition hover:bg-emerald-400 disabled:opacity-60"
+      >
+        {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+        Crear San
+      </button>
+    </form>
+  );
+}
+
+function Field({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <label className="block">
+      <span className="mb-1.5 block text-sm text-slate-300">{label}</span>
+      {children}
+    </label>
+  );
+}
