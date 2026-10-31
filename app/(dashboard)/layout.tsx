@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Navbar } from "@/components/Navbar";
+import { NotificationOptIn } from "@/components/NotificationOptIn";
 
 export default async function DashboardLayout({
   children,
@@ -27,6 +28,7 @@ export default async function DashboardLayout({
         isAdmin={profile?.role === "admin"}
       />
       <main className="mx-auto max-w-5xl px-4 py-6 sm:px-6">{children}</main>
+      <NotificationOptIn />
     </div>
   );
 }

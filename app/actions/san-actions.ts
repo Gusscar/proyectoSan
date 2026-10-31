@@ -2,7 +2,9 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { sendAnnouncementPush } from "@/lib/push";
 import type { Frequency } from "@/lib/supabase/types";
 
 export interface CreateSanInput {
@@ -69,13 +71,26 @@ export async function reorderTurns(sanId: string, members: ReorderItem[]) {
 export async function updateAnnouncement(sanId: string, announcement: string) {
   const supabase = await createClient();
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("sans")
     .update({ announcement })
-    .eq("id", sanId);
+    .eq("id", sanId)
+    .select("name")
+    .single();
 
   if (error) throw new Error(error.message);
 
   revalidatePath(`/admin/manage/${sanId}`);
   revalidatePath("/");
+
+  // `after()` corre esto una vez enviada la respuesta, pero mantiene vivo
+  // el runtime hasta que termine (en vez de un fire-and-forget que Vercel
+  // podría cortar al cerrar la función serverless).
+  after(async () => {
+    try {
+      await sendAnnouncementPush(sanId, data?.name ?? "SanApp", announcement);
+    } catch (err) {
+      console.error("Error enviando push de aviso:", err);
+    }
+  });
 }

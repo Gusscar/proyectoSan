@@ -80,6 +80,18 @@ create table public.member_credentials (
 );
 
 -- ============================================================
+-- 6. TABLA DE SUSCRIPCIONES PUSH (avisos en el celular)
+-- ============================================================
+create table public.push_subscriptions (
+  id uuid default uuid_generate_v4() primary key,
+  user_id uuid references public.profiles(id) on delete cascade not null,
+  endpoint text not null unique,
+  p256dh text not null,
+  auth text not null,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- ============================================================
 -- FUNCIONES AUXILIARES (SECURITY DEFINER)
 -- ============================================================
 -- Se usan `security definer` para evitar "infinite recursion detected in
@@ -210,6 +222,7 @@ alter table public.sans enable row level security;
 alter table public.san_members enable row level security;
 alter table public.payments enable row level security;
 alter table public.member_credentials enable row level security;
+alter table public.push_subscriptions enable row level security;
 
 -- ============================================================
 -- POLÍTICAS: profiles
@@ -289,6 +302,19 @@ create policy "member_credentials_select_admin" on public.member_credentials
 -- que no pasa por RLS. Queda denegado por defecto para cualquier cliente.
 
 -- ============================================================
+-- POLÍTICAS: push_subscriptions (cada usuario administra las suyas)
+-- ============================================================
+create policy "push_subscriptions_insert_own" on public.push_subscriptions
+  for insert with check (auth.uid() = user_id);
+
+create policy "push_subscriptions_update_own" on public.push_subscriptions
+  for update using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
+
+create policy "push_subscriptions_delete_own" on public.push_subscriptions
+  for delete using (auth.uid() = user_id);
+
+-- ============================================================
 -- ÍNDICES
 -- ============================================================
 create index idx_san_members_san_id on public.san_members(san_id);
@@ -296,6 +322,7 @@ create index idx_san_members_user_id on public.san_members(user_id);
 create index idx_payments_san_id on public.payments(san_id);
 create index idx_payments_user_id on public.payments(user_id);
 create index idx_member_credentials_san_id on public.member_credentials(san_id);
+create index idx_push_subscriptions_user_id on public.push_subscriptions(user_id);
 
 -- ============================================================
 -- BOOTSTRAP: primer administrador

@@ -66,7 +66,7 @@ export default async function ManageSanPage(props: PageProps<"/admin/manage/[id]
         </p>
       </div>
 
-      <AnnouncementEditor sanId={san.id} initialAnnouncement={san.announcement} />
+      <AnnouncementEditor sanId={san.id} currentAnnouncement={san.announcement} />
 
       <div className="grid gap-6 lg:grid-cols-2">
         <AddParticipantForm
