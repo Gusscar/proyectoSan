@@ -2,12 +2,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { getTransparencyRows } from "@/lib/queries";
-import { getCurrentRound, formatCurrency } from "@/lib/utils";
+import { getTransparencyRows, getPaymentsHistory } from "@/lib/queries";
+import { getCurrentRound, formatCurrency, formatDate } from "@/lib/utils";
 import { AnnouncementEditor } from "@/components/AnnouncementEditor";
 import { AddParticipantForm } from "@/components/AddParticipantForm";
 import { ReorderTurnsList } from "@/components/ReorderTurnsList";
 import { LogPaymentModal } from "@/components/LogPaymentModal";
+import { PaymentsMatrix } from "@/components/PaymentsMatrix";
 
 export default async function ManageSanPage(props: PageProps<"/admin/manage/[id]">) {
   const { id } = await props.params;
@@ -36,12 +37,10 @@ export default async function ManageSanPage(props: PageProps<"/admin/manage/[id]
     san.total_turns,
   );
 
-  const rows = await getTransparencyRows(
-    supabase,
-    san.id,
-    round,
-    san.contribution_amount,
-  );
+  const [rows, history] = await Promise.all([
+    getTransparencyRows(supabase, san.id, round, san.contribution_amount),
+    getPaymentsHistory(supabase, san.id),
+  ]);
 
   const sortedRows = [...rows].sort(
     (a, b) => a.member.turn_number - b.member.turn_number,
@@ -61,8 +60,7 @@ export default async function ManageSanPage(props: PageProps<"/admin/manage/[id]
         <h1 className="text-lg font-semibold text-slate-100">{san.name}</h1>
         <p className="text-sm text-slate-500">
           {formatCurrency(san.contribution_amount)} ·{" "}
-          {san.total_turns} turnos · inicia{" "}
-          {new Date(san.start_date).toLocaleDateString("es-MX")}
+          {san.total_turns} turnos · inicia {formatDate(san.start_date)}
         </p>
       </div>
 
@@ -163,6 +161,14 @@ export default async function ManageSanPage(props: PageProps<"/admin/manage/[id]
           </table>
         </div>
       </div>
+
+      <PaymentsMatrix
+        rows={history}
+        totalTurns={san.total_turns}
+        contributionAmount={san.contribution_amount}
+        frequency={san.frequency}
+        currentRound={round}
+      />
     </div>
   );
 }

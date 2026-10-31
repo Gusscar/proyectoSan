@@ -1,10 +1,11 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getTransparencyRows } from "@/lib/queries";
+import { getTransparencyRows, getPaymentsHistory } from "@/lib/queries";
 import { getCurrentRound } from "@/lib/utils";
 import { MyTurnCard } from "@/components/MyTurnCard";
 import { TransparencyBoard } from "@/components/TransparencyBoard";
 import { AnnouncementBanner } from "@/components/AnnouncementBanner";
+import { PaymentsMatrix } from "@/components/PaymentsMatrix";
 import type { San, SanMember } from "@/lib/supabase/types";
 
 export default async function HomePage() {
@@ -40,19 +41,17 @@ export default async function HomePage() {
         san.frequency,
         san.total_turns,
       );
-      const rows = await getTransparencyRows(
-        supabase,
-        san.id,
-        currentRound,
-        san.contribution_amount,
-      );
-      return { san, membership, rows };
+      const [rows, history] = await Promise.all([
+        getTransparencyRows(supabase, san.id, currentRound, san.contribution_amount),
+        getPaymentsHistory(supabase, san.id),
+      ]);
+      return { san, membership, rows, history, currentRound };
     }),
   );
 
   return (
     <div className="space-y-8">
-      {sections.map(({ san, membership, rows }) => (
+      {sections.map(({ san, membership, rows, history, currentRound }) => (
         <section key={san.id} className="space-y-4">
           <AnnouncementBanner announcement={san.announcement} />
           <MyTurnCard
@@ -65,6 +64,14 @@ export default async function HomePage() {
           <TransparencyBoard
             rows={rows}
             contributionAmount={san.contribution_amount}
+            currentUserId={user.id}
+          />
+          <PaymentsMatrix
+            rows={history}
+            totalTurns={san.total_turns}
+            contributionAmount={san.contribution_amount}
+            frequency={san.frequency}
+            currentRound={currentRound}
             currentUserId={user.id}
           />
         </section>

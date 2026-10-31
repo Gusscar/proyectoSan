@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { Loader2 } from "lucide-react";
 import { createSan } from "@/app/actions/san-actions";
+import { CurrencyInput } from "@/components/CurrencyInput";
 import type { Frequency } from "@/lib/supabase/types";
 
 export function CreateSanForm() {
@@ -49,15 +50,11 @@ export function CreateSanForm() {
 
       <div className="grid grid-cols-2 gap-4">
         <Field label="Monto por periodo">
-          <input
+          <CurrencyInput
             required
-            type="number"
-            step="0.01"
-            min="0"
             value={contributionAmount}
-            onChange={(e) => setContributionAmount(e.target.value)}
-            placeholder="1000"
-            className="input"
+            onChange={setContributionAmount}
+            placeholder="50.000,00"
           />
         </Field>
 

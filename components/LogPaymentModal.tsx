@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { CircleCheck, Loader2, Wallet, X } from "lucide-react";
 import { addPaymentAbono } from "@/app/actions/payment-actions";
+import { CurrencyInput } from "@/components/CurrencyInput";
 import { formatCurrency } from "@/lib/utils";
 
 interface LogPaymentModalProps {
@@ -98,15 +99,11 @@ export function LogPaymentModal({
             </p>
 
             <form onSubmit={handleSubmit} className="space-y-3">
-              <input
-                type="number"
-                step="0.01"
-                min="0"
+              <CurrencyInput
                 autoFocus
                 value={amount}
-                onChange={(event) => setAmount(event.target.value)}
+                onChange={setAmount}
                 placeholder="Monto a abonar"
-                className="w-full rounded-lg border border-slate-800 bg-slate-950 px-3 py-2.5 text-sm text-slate-100 outline-none ring-emerald-500/50 placeholder:text-slate-600 focus:ring-2"
               />
 
               {error && <p className="text-xs text-rose-400">{error}</p>}
