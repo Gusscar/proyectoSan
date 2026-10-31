@@ -71,7 +71,12 @@ export default async function ManageSanPage(props: PageProps<"/admin/manage/[id]
           sanId={san.id}
           startDate={san.start_date}
           frequency={san.frequency}
-          nextTurnNumber={rows.length + 1}
+          totalTurns={san.total_turns}
+          occupiedTurns={sortedRows.map((row) => ({
+            turnNumber: row.member.turn_number,
+            fullName: row.profile.full_name,
+            payoutDate: row.member.payout_date,
+          }))}
         />
         <ReorderTurnsList
           sanId={san.id}

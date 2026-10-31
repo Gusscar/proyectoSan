@@ -1,17 +1,19 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { CheckCircle2, Copy, Loader2, UserPlus } from "lucide-react";
 import { computePayoutDate, normalizeUsername } from "@/lib/utils";
 import { WhatsAppShareButton } from "@/components/WhatsAppShareButton";
+import { TurnsGrid, type OccupiedTurn } from "@/components/TurnsGrid";
 import type { Frequency } from "@/lib/supabase/types";
 
 interface AddParticipantFormProps {
   sanId: string;
   startDate: string;
   frequency: Frequency;
-  nextTurnNumber: number;
+  totalTurns: number;
+  occupiedTurns: OccupiedTurn[];
 }
 
 interface CreatedCredential {
@@ -21,29 +23,52 @@ interface CreatedCredential {
   tempPassword: string;
 }
 
+function firstAvailableTurn(totalTurns: number, occupied: OccupiedTurn[]) {
+  const taken = new Set(occupied.map((o) => o.turnNumber));
+  for (let i = 1; i <= totalTurns; i++) {
+    if (!taken.has(i)) return i;
+  }
+  return null;
+}
+
 export function AddParticipantForm({
   sanId,
   startDate,
   frequency,
-  nextTurnNumber,
+  totalTurns,
+  occupiedTurns,
 }: AddParticipantFormProps) {
   const router = useRouter();
   const [username, setUsername] = useState("");
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
-  const [turnNumber, setTurnNumber] = useState(String(nextTurnNumber));
+  const [turnNumber, setTurnNumber] = useState<number | null>(() =>
+    firstAvailableTurn(totalTurns, occupiedTurns),
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [created, setCreated] = useState<CreatedCredential | null>(null);
 
+  useEffect(() => {
+    const taken = new Set(occupiedTurns.map((o) => o.turnNumber));
+    setTurnNumber((prev) =>
+      prev !== null && !taken.has(prev)
+        ? prev
+        : firstAvailableTurn(totalTurns, occupiedTurns),
+    );
+  }, [occupiedTurns, totalTurns]);
+
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
+    if (!turnNumber) {
+      setError("Elige un turno disponible");
+      return;
+    }
     setLoading(true);
     setError(null);
     setCreated(null);
 
-    const turn = Number(turnNumber);
-    const payoutDate = computePayoutDate(startDate, frequency, turn - 1);
+    const payoutDate = computePayoutDate(startDate, frequency, turnNumber - 1);
     const cleanUsername = normalizeUsername(username);
 
     try {
@@ -55,7 +80,7 @@ export function AddParticipantForm({
           fullName,
           phone: phone || undefined,
           sanId,
-          turnNumber: turn,
+          turnNumber,
           payoutDate,
         }),
       });
@@ -72,7 +97,6 @@ export function AddParticipantForm({
       setUsername("");
       setFullName("");
       setPhone("");
-      setTurnNumber(String(turn + 1));
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error inesperado");
@@ -81,6 +105,8 @@ export function AddParticipantForm({
     }
   }
 
+  const noTurnsLeft = firstAvailableTurn(totalTurns, occupiedTurns) === null;
+
   return (
     <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
       <h2 className="mb-4 flex items-center gap-2 text-sm font-semibold text-slate-100">
@@ -88,14 +114,14 @@ export function AddParticipantForm({
         Agregar participante
       </h2>
 
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <form onSubmit={handleSubmit} className="space-y-3">
         <input
           required
           type="text"
           placeholder="Nombre completo"
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
-          className="input sm:col-span-2"
+          className="input"
         />
         <input
           required
@@ -103,7 +129,7 @@ export function AddParticipantForm({
           placeholder="Usuario (para iniciar sesión)"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          className="input sm:col-span-2"
+          className="input"
           autoCapitalize="none"
           autoCorrect="off"
         />
@@ -114,22 +140,29 @@ export function AddParticipantForm({
           onChange={(e) => setPhone(e.target.value)}
           className="input"
         />
-        <input
-          required
-          type="number"
-          min="1"
-          placeholder="Turno"
-          value={turnNumber}
-          onChange={(e) => setTurnNumber(e.target.value)}
-          className="input"
-        />
 
-        {error && <p className="text-xs text-rose-400 sm:col-span-2">{error}</p>}
+        <div>
+          <span className="mb-1.5 block text-sm text-slate-300">Turno</span>
+          {noTurnsLeft ? (
+            <p className="text-xs text-rose-400">
+              No quedan turnos disponibles en este San.
+            </p>
+          ) : (
+            <TurnsGrid
+              totalTurns={totalTurns}
+              occupied={occupiedTurns}
+              value={turnNumber}
+              onChange={setTurnNumber}
+            />
+          )}
+        </div>
+
+        {error && <p className="text-xs text-rose-400">{error}</p>}
 
         <button
           type="submit"
-          disabled={loading}
-          className="flex items-center justify-center gap-2 rounded-lg bg-indigo-500 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-400 disabled:opacity-60 sm:col-span-2"
+          disabled={loading || noTurnsLeft}
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-500 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-400 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {loading && <Loader2 className="h-4 w-4 animate-spin" />}
           Crear acceso

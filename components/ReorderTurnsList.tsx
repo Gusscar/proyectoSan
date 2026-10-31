@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowDown, ArrowUp, Loader2, Save } from "lucide-react";
+import { ArrowDown, ArrowUp, CheckCircle2, Loader2, Save } from "lucide-react";
 import { reorderTurns } from "@/app/actions/san-actions";
 import { computePayoutDate, formatDate } from "@/lib/utils";
 import type { Frequency } from "@/lib/supabase/types";
@@ -90,20 +90,31 @@ export function ReorderTurnsList({
       {error && <p className="mb-3 text-xs text-rose-400">{error}</p>}
 
       <ul className="space-y-2">
-        {order.map((member, index) => (
+        {order.map((member, index) => {
+          const payoutDate = dirty
+            ? computePayoutDate(startDate, frequency, index)
+            : member.payoutDate;
+          const received = new Date(payoutDate) <= new Date();
+          return (
           <li
             key={member.id}
             className="flex items-center justify-between rounded-xl border border-slate-800/80 bg-slate-950/40 px-4 py-3"
           >
             <div>
-              <p className="text-sm font-medium text-slate-100">
+              <p className="flex items-center gap-1.5 text-sm font-medium text-slate-100">
                 #{dirty ? index + 1 : member.turnNumber} · {member.fullName}
+                {received && (
+                  <span
+                    title="Ya recibió el pozo"
+                    className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-1.5 py-0.5 text-[10px] font-medium text-emerald-400 ring-1 ring-inset ring-emerald-500/30"
+                  >
+                    <CheckCircle2 className="h-2.5 w-2.5" />
+                    Ya recibió
+                  </span>
+                )}
               </p>
               <p className="text-xs text-slate-500">
-                Cobra:{" "}
-                {dirty
-                  ? formatDate(computePayoutDate(startDate, frequency, index))
-                  : formatDate(member.payoutDate)}
+                Cobra: {formatDate(payoutDate)}
               </p>
             </div>
             <div className="flex gap-1">
@@ -125,7 +136,8 @@ export function ReorderTurnsList({
               </button>
             </div>
           </li>
-        ))}
+          );
+        })}
       </ul>
     </div>
   );
