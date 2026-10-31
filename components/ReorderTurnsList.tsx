@@ -97,7 +97,7 @@ export function ReorderTurnsList({
           >
             <div>
               <p className="text-sm font-medium text-slate-100">
-                #{index + 1} · {member.fullName}
+                #{dirty ? index + 1 : member.turnNumber} · {member.fullName}
               </p>
               <p className="text-xs text-slate-500">
                 Cobra:{" "}
