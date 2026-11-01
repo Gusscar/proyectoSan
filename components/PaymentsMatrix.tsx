@@ -1,12 +1,6 @@
-import { cn, formatCurrency, getPaymentStatus, PAYMENT_STATUS_DOT_COLOR } from "@/lib/utils";
+import { cn, formatCurrency, getPaymentStatus, PAYMENT_STATUS_DOT_COLOR, PERIOD_LABEL } from "@/lib/utils";
 import type { Frequency } from "@/lib/supabase/types";
 import type { MemberPaymentHistory } from "@/lib/queries";
-
-const PERIOD_LABEL: Record<Frequency, string> = {
-  weekly: "Semana",
-  biweekly: "Quincena",
-  monthly: "Mes",
-};
 
 interface PaymentsMatrixProps {
   rows: MemberPaymentHistory[];

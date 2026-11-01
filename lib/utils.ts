@@ -142,6 +142,12 @@ export function getPaymentStatus(
   return "incompleto";
 }
 
+export const PERIOD_LABEL: Record<Frequency, string> = {
+  weekly: "Semana",
+  biweekly: "Quincena",
+  monthly: "Mes",
+};
+
 export const PAYMENT_STATUS_LABEL: Record<PaymentStatus, string> = {
   "al-dia": "Al día",
   incompleto: "Incompleto",

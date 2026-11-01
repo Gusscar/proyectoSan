@@ -149,7 +149,16 @@ export default async function ManageSanPage(props: PageProps<"/admin/manage/[id]
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200">
-              {sortedRows.map((row) => (
+              {sortedRows.map((row) => {
+                const memberHistory = history.find(
+                  (h) => h.profile.id === row.profile.id,
+                );
+                const paidByRound = Object.fromEntries(
+                  Array.from(memberHistory?.paymentsByRound.entries() ?? []).map(
+                    ([period, payment]) => [period, payment.amount_paid],
+                  ),
+                );
+                return (
                 <tr key={row.member.id}>
                   <td className="px-5 py-3 font-medium text-slate-700">
                     #{row.member.turn_number}
@@ -166,9 +175,11 @@ export default async function ManageSanPage(props: PageProps<"/admin/manage/[id]
                       sanId={san.id}
                       userId={row.profile.id}
                       memberName={row.profile.full_name}
-                      roundNumber={round}
+                      initialRound={round}
+                      totalTurns={san.total_turns}
+                      frequency={san.frequency}
                       contributionAmount={san.contribution_amount}
-                      amountPaid={row.payment?.amount_paid ?? 0}
+                      paidByRound={paidByRound}
                     />
                   </td>
                   <td className="px-5 py-3">
@@ -179,7 +190,8 @@ export default async function ManageSanPage(props: PageProps<"/admin/manage/[id]
                     />
                   </td>
                 </tr>
-              ))}
+                );
+              })}
               {sortedRows.length === 0 && (
                 <tr>
                   <td
