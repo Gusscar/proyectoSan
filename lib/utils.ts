@@ -54,11 +54,33 @@ export function resolveLoginIdentifier(input: string) {
   return trimmed.includes("@") ? trimmed : usernameToEmail(trimmed);
 }
 
-const FREQUENCY_DAYS: Record<Frequency, number> = {
+const FREQUENCY_DAYS: Record<"weekly" | "monthly", number> = {
   weekly: 7,
-  biweekly: 14,
   monthly: 30,
 };
+
+function daysInMonth(year: number, monthZeroBased: number) {
+  return new Date(Date.UTC(year, monthZeroBased + 1, 0)).getUTCDate();
+}
+
+/**
+ * Avanza una fecha a la siguiente quincena calendario: si cae en la primera
+ * mitad del mes (día ≤ 15) salta al día 30 del mismo mes (o al último día
+ * si el mes es más corto, p. ej. febrero); si cae en la segunda mitad,
+ * salta al día 15 del mes siguiente. Así "quincenal" sigue el patrón real
+ * 15/30 en vez de sumar 14 días fijos, que se va desfasando mes a mes.
+ */
+function nextQuincena(date: Date): Date {
+  const year = date.getUTCFullYear();
+  const month = date.getUTCMonth();
+  const day = date.getUTCDate();
+
+  if (day <= 15) {
+    const lastDay = Math.min(30, daysInMonth(year, month));
+    return new Date(Date.UTC(year, month, lastDay));
+  }
+  return new Date(Date.UTC(year, month + 1, 15));
+}
 
 /**
  * Calcula la ronda/periodo actual del San a partir de la fecha de inicio.
@@ -70,6 +92,18 @@ export function getCurrentRound(
   totalTurns: number,
   now: Date = new Date(),
 ) {
+  if (frequency === "biweekly") {
+    let date = new Date(startDate);
+    let round = 1;
+    while (round < totalTurns) {
+      const next = nextQuincena(date);
+      if (next.getTime() > now.getTime()) break;
+      date = next;
+      round++;
+    }
+    return round;
+  }
+
   const start = new Date(startDate);
   const diffDays = Math.floor(
     (now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24),
@@ -84,6 +118,14 @@ export function computePayoutDate(
   frequency: Frequency,
   turnIndexZeroBased: number,
 ) {
+  if (frequency === "biweekly") {
+    let date = new Date(startDate);
+    for (let i = 0; i < turnIndexZeroBased; i++) {
+      date = nextQuincena(date);
+    }
+    return date.toISOString().slice(0, 10);
+  }
+
   const date = new Date(startDate);
   date.setUTCDate(date.getUTCDate() + FREQUENCY_DAYS[frequency] * turnIndexZeroBased);
   return date.toISOString().slice(0, 10);
