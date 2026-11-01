@@ -113,6 +113,27 @@ export async function joinSanAsAdmin(
   revalidatePath("/");
 }
 
+export async function setPayoutReceived(
+  sanId: string,
+  memberId: string,
+  received: boolean,
+) {
+  const supabase = await createClient();
+
+  // RLS (`san_members_update_admin`) exige que el llamante sea el admin
+  // dueño del San.
+  const { error } = await supabase
+    .from("san_members")
+    .update({ payout_received: received })
+    .eq("id", memberId)
+    .eq("san_id", sanId);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/admin/manage/${sanId}`);
+  revalidatePath("/");
+}
+
 export async function updateAnnouncement(sanId: string, announcement: string) {
   const supabase = await createClient();
 

@@ -42,6 +42,7 @@ create table public.san_members (
   user_id uuid references public.profiles(id) on delete cascade not null,
   turn_number integer not null check (turn_number > 0),
   payout_date date not null,
+  payout_received boolean not null default false,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   unique (san_id, turn_number),
   unique (san_id, user_id)

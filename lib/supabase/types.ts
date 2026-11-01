@@ -29,6 +29,7 @@ export interface SanMember {
   user_id: string;
   turn_number: number;
   payout_date: string;
+  payout_received: boolean;
   created_at: string;
 }
 

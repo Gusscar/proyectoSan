@@ -8,6 +8,7 @@ import { AnnouncementEditor } from "@/components/AnnouncementEditor";
 import { AddParticipantForm } from "@/components/AddParticipantForm";
 import { ReorderTurnsList } from "@/components/ReorderTurnsList";
 import { LogPaymentModal } from "@/components/LogPaymentModal";
+import { PayoutStatusToggle } from "@/components/PayoutStatusToggle";
 import { PaymentsMatrix } from "@/components/PaymentsMatrix";
 import { JoinAsParticipantCard } from "@/components/JoinAsParticipantCard";
 
@@ -144,6 +145,7 @@ export default async function ManageSanPage(props: PageProps<"/admin/manage/[id]
                 <th className="px-5 py-3">Participante</th>
                 <th className="px-5 py-3">Abonado</th>
                 <th className="px-5 py-3">Acción</th>
+                <th className="px-5 py-3">Entrega del pozo</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200">
@@ -169,12 +171,19 @@ export default async function ManageSanPage(props: PageProps<"/admin/manage/[id]
                       amountPaid={row.payment?.amount_paid ?? 0}
                     />
                   </td>
+                  <td className="px-5 py-3">
+                    <PayoutStatusToggle
+                      sanId={san.id}
+                      memberId={row.member.id}
+                      received={row.member.payout_received}
+                    />
+                  </td>
                 </tr>
               ))}
               {sortedRows.length === 0 && (
                 <tr>
                   <td
-                    colSpan={4}
+                    colSpan={5}
                     className="px-5 py-8 text-center text-sm text-slate-500"
                   >
                     Agrega participantes para comenzar a registrar abonos.

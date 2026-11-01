@@ -16,6 +16,13 @@ export default async function HomePage() {
 
   if (!user) redirect("/login");
 
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+  const isAdmin = profile?.role === "admin";
+
   const { data: memberships } = await supabase
     .from("san_members")
     .select("*, sans(*)")
@@ -65,9 +72,14 @@ export default async function HomePage() {
             rows={rows}
             contributionAmount={san.contribution_amount}
             currentUserId={user.id}
+            restricted={!isAdmin}
           />
           <PaymentsMatrix
-            rows={history}
+            rows={
+              isAdmin
+                ? history
+                : history.filter((h) => h.profile.id === user.id)
+            }
             totalTurns={san.total_turns}
             contributionAmount={san.contribution_amount}
             frequency={san.frequency}
