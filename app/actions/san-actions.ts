@@ -113,6 +113,25 @@ export async function joinSanAsAdmin(
   revalidatePath("/");
 }
 
+export async function removeParticipant(sanId: string, memberId: string) {
+  const supabase = await createClient();
+
+  // RLS (`san_members_delete_admin`) exige que el llamante sea el admin
+  // dueño del San. Los abonos ya registrados no se borran (quedan en
+  // `payments` bajo ese user_id), solo deja de aparecer como miembro y su
+  // turno queda libre para que otra persona (o el admin) lo tome.
+  const { error } = await supabase
+    .from("san_members")
+    .delete()
+    .eq("id", memberId)
+    .eq("san_id", sanId);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/admin/manage/${sanId}`);
+  revalidatePath("/");
+}
+
 export async function setPayoutReceived(
   sanId: string,
   memberId: string,

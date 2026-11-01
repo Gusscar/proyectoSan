@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowDown, ArrowUp, CheckCircle2, Loader2, Save } from "lucide-react";
-import { reorderTurns } from "@/app/actions/san-actions";
+import { ArrowDown, ArrowUp, CheckCircle2, Loader2, Save, Trash2 } from "lucide-react";
+import { reorderTurns, removeParticipant } from "@/app/actions/san-actions";
 import { computePayoutDate, formatDate } from "@/lib/utils";
 import type { Frequency } from "@/lib/supabase/types";
 
@@ -34,6 +34,7 @@ export function ReorderTurnsList({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [dirty, setDirty] = useState(false);
+  const [removingId, setRemovingId] = useState<string | null>(null);
 
   // `useState`'s initializer solo corre una vez: si el admin agrega o
   // reordena participantes y el servidor pasa un `members` nuevo, el
@@ -52,6 +53,25 @@ export function ReorderTurnsList({
     [next[index], next[target]] = [next[target], next[index]];
     setOrder(next);
     setDirty(true);
+  }
+
+  async function handleRemove(member: ReorderMember) {
+    const confirmed = window.confirm(
+      `¿Eliminar a ${member.fullName} del San? Su turno #${member.turnNumber} quedará libre. Esto no se puede deshacer.`,
+    );
+    if (!confirmed) return;
+
+    setRemovingId(member.id);
+    setError(null);
+    try {
+      await removeParticipant(sanId, member.id);
+      setOrder((prev) => prev.filter((m) => m.id !== member.id));
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "No se pudo eliminar al participante");
+    } finally {
+      setRemovingId(null);
+    }
   }
 
   async function handleSave() {
@@ -143,6 +163,18 @@ export function ReorderTurnsList({
                 aria-label="Bajar"
               >
                 <ArrowDown className="h-5 w-5" />
+              </button>
+              <button
+                onClick={() => handleRemove(member)}
+                disabled={removingId === member.id}
+                className="rounded-lg p-2 text-rose-600 transition hover:bg-rose-100 disabled:opacity-30"
+                aria-label="Eliminar participante"
+              >
+                {removingId === member.id ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  <Trash2 className="h-5 w-5" />
+                )}
               </button>
             </div>
           </li>
