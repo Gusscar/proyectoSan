@@ -10,6 +10,7 @@ import type { Frequency } from "@/lib/supabase/types";
 
 interface LogPaymentModalProps {
   sanId: string;
+  memberId: string;
   userId: string;
   memberName: string;
   initialRound: number;
@@ -21,6 +22,7 @@ interface LogPaymentModalProps {
 
 export function LogPaymentModal({
   sanId,
+  memberId,
   userId,
   memberName,
   initialRound,
@@ -46,7 +48,7 @@ export function LogPaymentModal({
     setLoading(true);
     setError(null);
     try {
-      await addPaymentAbono(sanId, userId, round, amountToAdd);
+      await addPaymentAbono(sanId, memberId, userId, round, amountToAdd);
       setOpen(false);
       setAmount("");
       router.refresh();
@@ -81,7 +83,7 @@ export function LogPaymentModal({
     setLoading(true);
     setError(null);
     try {
-      await correctPaymentAmount(sanId, userId, round, value);
+      await correctPaymentAmount(sanId, memberId, userId, round, value);
       setEditing(false);
       setOpen(false);
       router.refresh();

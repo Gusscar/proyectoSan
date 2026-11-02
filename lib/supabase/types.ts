@@ -37,6 +37,7 @@ export interface Payment {
   id: string;
   san_id: string;
   user_id: string;
+  san_member_id: string;
   round_number: number;
   amount_paid: number;
   is_complete: boolean;

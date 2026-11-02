@@ -11,12 +11,17 @@ export interface OccupiedTurn {
 interface TurnsGridProps {
   totalTurns: number;
   occupied: OccupiedTurn[];
-  value: number | null;
+  /** Un solo turno seleccionado, o un arreglo si se permite elegir varios. */
+  value: number | number[] | null;
+  /** Se llama con el turno que se acaba de pulsar; el llamante decide si reemplaza o alterna la selección. */
   onChange: (turn: number) => void;
 }
 
 export function TurnsGrid({ totalTurns, occupied, value, onChange }: TurnsGridProps) {
   const occupiedMap = new Map(occupied.map((o) => [o.turnNumber, o]));
+  const selected = new Set(
+    Array.isArray(value) ? value : value !== null ? [value] : [],
+  );
   const today = new Date();
   const turns = Array.from({ length: totalTurns }, (_, i) => i + 1);
 
@@ -26,7 +31,7 @@ export function TurnsGrid({ totalTurns, occupied, value, onChange }: TurnsGridPr
         {turns.map((turn) => {
           const member = occupiedMap.get(turn);
           const received = member ? new Date(member.payoutDate) <= today : false;
-          const isSelected = value === turn;
+          const isSelected = selected.has(turn);
 
           return (
             <button

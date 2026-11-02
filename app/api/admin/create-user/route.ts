@@ -13,8 +13,10 @@ interface CreateUserBody {
   fullName: string;
   phone?: string;
   sanId: string;
-  turnNumber: number;
-  payoutDate: string;
+  /** Uno o más turnos a asignar de una vez (p. ej. si aporta por partida doble). */
+  turnNumbers: number[];
+  /** Mismo orden/longitud que `turnNumbers`. */
+  payoutDates: string[];
 }
 
 export async function POST(req: Request) {
@@ -41,9 +43,16 @@ export async function POST(req: Request) {
   }
 
   const body = (await req.json()) as Partial<CreateUserBody>;
-  const { username, fullName, phone, sanId, turnNumber, payoutDate } = body;
+  const { username, fullName, phone, sanId, turnNumbers, payoutDates } = body;
 
-  if (!username || !fullName || !sanId || !turnNumber || !payoutDate) {
+  if (
+    !username ||
+    !fullName ||
+    !sanId ||
+    !turnNumbers?.length ||
+    !payoutDates?.length ||
+    turnNumbers.length !== payoutDates.length
+  ) {
     return NextResponse.json(
       { error: "Faltan campos requeridos" },
       { status: 400 },
@@ -111,13 +120,18 @@ export async function POST(req: Request) {
 
   // El perfil se crea solo vía trigger `on_auth_user_created`.
 
-  // 3. Vincular al San con su turno.
-  const { error: memberError } = await adminClient.from("san_members").insert({
-    san_id: sanId,
-    user_id: userId,
-    turn_number: turnNumber,
-    payout_date: payoutDate,
-  });
+  // 3. Vincular al San con su(s) turno(s). Un solo insert con varias filas
+  //    es atómico: si un turno ya fue tomado por otro admin justo ahora,
+  //    la constraint unique(san_id,turn_number) hace fallar TODO el insert,
+  //    sin dejar turnos a medio asignar.
+  const { error: memberError } = await adminClient.from("san_members").insert(
+    turnNumbers.map((turnNumber, i) => ({
+      san_id: sanId,
+      user_id: userId,
+      turn_number: turnNumber,
+      payout_date: payoutDates[i],
+    })),
+  );
 
   if (memberError) {
     await adminClient.auth.admin.deleteUser(userId);

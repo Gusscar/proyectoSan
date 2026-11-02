@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { getTransparencyRows, getPaymentsHistory } from "@/lib/queries";
+import { getTransparencyRows, getPaymentsHistory, getAdminParticipants } from "@/lib/queries";
 import { getCurrentRound, formatCurrency, formatDate } from "@/lib/utils";
 import { AnnouncementEditor } from "@/components/AnnouncementEditor";
 import { AddParticipantForm } from "@/components/AddParticipantForm";
@@ -42,9 +42,10 @@ export default async function ManageSanPage(props: PageProps<"/admin/manage/[id]
     san.total_turns,
   );
 
-  const [rows, history] = await Promise.all([
+  const [rows, history, existingParticipants] = await Promise.all([
     getTransparencyRows(supabase, san.id, round, san.contribution_amount),
     getPaymentsHistory(supabase, san.id),
+    user ? getAdminParticipants(supabase, user.id, san.id) : Promise.resolve([]),
   ]);
 
   const sortedRows = [...rows].sort(
@@ -87,6 +88,7 @@ export default async function ManageSanPage(props: PageProps<"/admin/manage/[id]
           frequency={san.frequency}
           totalTurns={san.total_turns}
           occupiedTurns={occupiedTurns}
+          existingParticipants={existingParticipants}
         />
         <ReorderTurnsList
           sanId={san.id}
@@ -151,7 +153,7 @@ export default async function ManageSanPage(props: PageProps<"/admin/manage/[id]
             <tbody className="divide-y divide-slate-200">
               {sortedRows.map((row) => {
                 const memberHistory = history.find(
-                  (h) => h.profile.id === row.profile.id,
+                  (h) => h.member.id === row.member.id,
                 );
                 const paidByRound = Object.fromEntries(
                   Array.from(memberHistory?.paymentsByRound.entries() ?? []).map(
@@ -173,6 +175,7 @@ export default async function ManageSanPage(props: PageProps<"/admin/manage/[id]
                   <td className="px-5 py-3">
                     <LogPaymentModal
                       sanId={san.id}
+                      memberId={row.member.id}
                       userId={row.profile.id}
                       memberName={row.profile.full_name}
                       initialRound={round}

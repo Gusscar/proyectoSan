@@ -10,6 +10,7 @@ function round2(value: number) {
 
 export async function addPaymentAbono(
   sanId: string,
+  memberId: string,
   userId: string,
   roundNumber: number,
   amountToAdd: number,
@@ -31,8 +32,7 @@ export async function addPaymentAbono(
   const { data: currentPayment } = await supabase
     .from("payments")
     .select("amount_paid")
-    .eq("san_id", sanId)
-    .eq("user_id", userId)
+    .eq("san_member_id", memberId)
     .eq("round_number", roundNumber)
     .maybeSingle();
 
@@ -52,12 +52,13 @@ export async function addPaymentAbono(
     {
       san_id: sanId,
       user_id: userId,
+      san_member_id: memberId,
       round_number: roundNumber,
       amount_paid: newTotal,
       is_complete: isComplete,
       updated_at: new Date().toISOString(),
     },
-    { onConflict: "san_id,user_id,round_number" },
+    { onConflict: "san_member_id,round_number" },
   );
 
   if (error) throw new Error(error.message);
@@ -71,6 +72,7 @@ export async function addPaymentAbono(
 /** Corrige el total abonado de un periodo a un valor exacto (p. ej. si se registró mal). */
 export async function correctPaymentAmount(
   sanId: string,
+  memberId: string,
   userId: string,
   roundNumber: number,
   newAmount: number,
@@ -103,12 +105,13 @@ export async function correctPaymentAmount(
     {
       san_id: sanId,
       user_id: userId,
+      san_member_id: memberId,
       round_number: roundNumber,
       amount_paid: rounded,
       is_complete: isComplete,
       updated_at: new Date().toISOString(),
     },
-    { onConflict: "san_id,user_id,round_number" },
+    { onConflict: "san_member_id,round_number" },
   );
 
   if (error) throw new Error(error.message);

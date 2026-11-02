@@ -40,9 +40,21 @@ export default async function HomePage() {
     );
   }
 
+  // Si una persona tiene 2+ turnos en el mismo San, viene como 2+ filas de
+  // `memberships` con el mismo `san.id`: se agrupan para mostrar ese San UNA
+  // sola vez, con una MyTurnCard por cada turno que tenga ahí.
+  const bySan = new Map<string, { san: San; memberships: SanMember[] }>();
+  for (const membership of memberships) {
+    const entry = bySan.get(membership.san_id) ?? {
+      san: membership.sans,
+      memberships: [],
+    };
+    entry.memberships.push(membership);
+    bySan.set(membership.san_id, entry);
+  }
+
   const sections = await Promise.all(
-    memberships.map(async (membership) => {
-      const san = membership.sans;
+    [...bySan.values()].map(async ({ san, memberships: sanMemberships }) => {
       const currentRound = getCurrentRound(
         san.start_date,
         san.frequency,
@@ -52,22 +64,25 @@ export default async function HomePage() {
         getTransparencyRows(supabase, san.id, currentRound, san.contribution_amount),
         getPaymentsHistory(supabase, san.id),
       ]);
-      return { san, membership, rows, history, currentRound };
+      return { san, memberships: sanMemberships, rows, history, currentRound };
     }),
   );
 
   return (
     <div className="space-y-8">
-      {sections.map(({ san, membership, rows, history, currentRound }) => (
+      {sections.map(({ san, memberships: sanMemberships, rows, history, currentRound }) => (
         <section key={san.id} className="space-y-4">
           <AnnouncementBanner announcement={san.announcement} />
-          <MyTurnCard
-            sanName={san.name}
-            turnNumber={membership.turn_number}
-            totalTurns={san.total_turns}
-            payoutDate={membership.payout_date}
-            potAmount={san.contribution_amount * san.total_turns}
-          />
+          {sanMemberships.map((membership) => (
+            <MyTurnCard
+              key={membership.id}
+              sanName={san.name}
+              turnNumber={membership.turn_number}
+              totalTurns={san.total_turns}
+              payoutDate={membership.payout_date}
+              potAmount={san.contribution_amount * san.total_turns}
+            />
+          ))}
           <TransparencyBoard
             rows={rows}
             contributionAmount={san.contribution_amount}

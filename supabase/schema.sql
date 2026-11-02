@@ -36,6 +36,9 @@ create table public.sans (
 -- ============================================================
 -- 3. TABLA PIVOTE: MIEMBROS Y TURNOS
 -- ============================================================
+-- Nota: NO hay unique(san_id, user_id) a propósito — una misma persona
+-- puede tener más de un turno dentro del mismo San (p. ej. aporta doble).
+-- Cada turno es una fila independiente con su propio historial de abonos.
 create table public.san_members (
   id uuid default uuid_generate_v4() primary key,
   san_id uuid references public.sans(id) on delete cascade not null,
@@ -44,22 +47,26 @@ create table public.san_members (
   payout_date date not null,
   payout_received boolean not null default false,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
-  unique (san_id, turn_number),
-  unique (san_id, user_id)
+  unique (san_id, turn_number)
 );
 
 -- ============================================================
 -- 4. TABLA DE PAGOS / ABONOS
 -- ============================================================
+-- Los abonos se rastrean por TURNO (san_member_id), no por usuario: así,
+-- si una persona tiene 2 turnos en el mismo San, cada turno lleva su propio
+-- abono por periodo sin mezclarse con el otro. san_id/user_id se conservan
+-- como columnas de conveniencia para RLS y joins simples.
 create table public.payments (
   id uuid default uuid_generate_v4() primary key,
   san_id uuid references public.sans(id) on delete cascade not null,
   user_id uuid references public.profiles(id) on delete cascade not null,
+  san_member_id uuid references public.san_members(id) on delete cascade not null,
   round_number integer not null check (round_number > 0),
   amount_paid numeric(12,2) not null default 0 check (amount_paid >= 0),
   is_complete boolean not null default false,
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null,
-  unique (san_id, user_id, round_number)
+  unique (san_member_id, round_number)
 );
 
 -- ============================================================
@@ -322,6 +329,7 @@ create index idx_san_members_san_id on public.san_members(san_id);
 create index idx_san_members_user_id on public.san_members(user_id);
 create index idx_payments_san_id on public.payments(san_id);
 create index idx_payments_user_id on public.payments(user_id);
+create index idx_payments_san_member_id on public.payments(san_member_id);
 create index idx_member_credentials_san_id on public.member_credentials(san_id);
 create index idx_push_subscriptions_user_id on public.push_subscriptions(user_id);
 

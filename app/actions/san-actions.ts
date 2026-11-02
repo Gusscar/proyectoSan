@@ -113,6 +113,41 @@ export async function joinSanAsAdmin(
   revalidatePath("/");
 }
 
+export async function addExistingParticipant(
+  sanId: string,
+  userId: string,
+  turnNumber: number,
+  payoutDate: string,
+) {
+  if (!Number.isInteger(turnNumber) || turnNumber <= 0) {
+    throw new Error("Elige un turno válido");
+  }
+
+  const supabase = await createClient();
+
+  // RLS (`san_members_insert_admin`) ya exige que el llamante sea el admin
+  // dueño del San; a diferencia de /api/admin/create-user, aquí NO se crea
+  // una cuenta ni credencial nueva: la persona ya tiene usuario/contraseña
+  // de otro San suyo y los reutiliza para ver ambos al iniciar sesión.
+  const { error } = await supabase.from("san_members").insert({
+    san_id: sanId,
+    user_id: userId,
+    turn_number: turnNumber,
+    payout_date: payoutDate,
+  });
+
+  if (error) {
+    if (error.code === "23505") {
+      throw new Error("Ese turno ya está ocupado o esa persona ya participa en este San");
+    }
+    throw new Error(error.message);
+  }
+
+  revalidatePath(`/admin/manage/${sanId}`);
+  revalidatePath("/admin/users");
+  revalidatePath("/");
+}
+
 export async function removeParticipant(sanId: string, memberId: string) {
   const supabase = await createClient();
 
